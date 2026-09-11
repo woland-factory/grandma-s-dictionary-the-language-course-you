@@ -1,0 +1,30 @@
+name: grandma-s-dictionary-the-language-course-you-staging
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: grandma-s-dictionary-the-language-course-you-staging-web
+    expose:
+      - "80"
+    environment:
+      # Staging shows the demo dictionary so a visitor sees real value fast.
+      SEED_DEMO: "1"
+      UMAMI_URL: "${UMAMI_URL:-}"
+      UMAMI_WEBSITE_ID: "${UMAMI_WEBSITE_ID:-}"
+      SENTRY_DSN: "${SENTRY_DSN:-}"
+    networks:
+      - default
+      - staging
+    mem_limit: 512m
+    oom_score_adj: 800
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/healthz >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+networks:
+  staging:
+    external: true
+    name: factory-staging-net
