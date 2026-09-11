@@ -1,0 +1,17 @@
+node_modules
+dist
+.git
+.gitignore
+.env
+.env.local
+*.local
+e2e
+test-results
+playwright-report
+.playwright
+scripts
+**/*.test.ts
+**/*.test.tsx
+README.md
+CLAUDE.md
+result.json
