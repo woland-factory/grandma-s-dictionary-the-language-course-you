@@ -14,6 +14,7 @@ const SCAN_DIRS = [
 const SCAN_FILES = [
   join(ROOT, "src", "App.tsx"),
   join(ROOT, "src", "main.tsx"),
+  join(ROOT, "src", "data", "deck.ts"),
   join(ROOT, ".env.example"),
   join(ROOT, "index.html"),
   join(ROOT, "public", "demo", "manifest.json"),

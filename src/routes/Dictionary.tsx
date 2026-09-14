@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { listEntries, type Entry } from "../lib/db";
+import { categoryLabel } from "../data/deck";
 import { LazyEntryPlayer } from "../components/LazyEntryPlayer";
 import { EmptyState } from "../components/states/EmptyState";
 import { LoadingSkeleton } from "../components/states/LoadingSkeleton";
@@ -30,7 +31,7 @@ export function Dictionary() {
         }}
       >
         <h1 style={{ margin: 0 }}>Your dictionary</h1>
-        <Link to="/new" className="btn btn--primary">
+        <Link to="/interview" className="btn btn--primary">
           Record
         </Link>
       </div>
@@ -42,8 +43,8 @@ export function Dictionary() {
           title="Record your first word"
           body="Sit with a grandparent and capture one word in their voice. It shows up here to play back."
           action={
-            <Link to="/new" className="btn btn--primary">
-              Record a word
+            <Link to="/interview" className="btn btn--primary">
+              Start recording
             </Link>
           }
         />
@@ -59,6 +60,11 @@ export function Dictionary() {
                   </p>
                   {entry.writtenForm ? (
                     <p className="entry-item__meaning">{entry.meaning}</p>
+                  ) : null}
+                  {entry.category && entry.category !== "uncategorized" ? (
+                    <span className="entry-item__tag">
+                      {categoryLabel(entry.category)}
+                    </span>
                   ) : null}
                 </Link>
               </div>

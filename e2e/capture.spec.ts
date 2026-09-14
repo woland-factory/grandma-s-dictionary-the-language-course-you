@@ -26,8 +26,9 @@ test("first paint shows real content, not a blank screen", async ({ page }) => {
 test("record, add details, save, see it listed, and play it back", async ({
   page,
 }) => {
-  await page.goto("/");
-  await page.getByTestId("home-record").click();
+  // Home now opens the guided interview; the single-word /new flow is reached
+  // directly and still records and saves.
+  await page.goto("/new");
 
   const recordBtn = page.getByTestId("record-button");
   await expect(recordBtn).toBeVisible();
@@ -62,8 +63,7 @@ test("record, add details, save, see it listed, and play it back", async ({
 });
 
 test("saved entries survive a full reload", async ({ page }) => {
-  await page.goto("/");
-  await page.getByTestId("home-record").click();
+  await page.goto("/new");
   const recordBtn = page.getByTestId("record-button");
   await recordBtn.click();
   await page.waitForTimeout(600);

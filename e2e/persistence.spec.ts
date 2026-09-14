@@ -26,8 +26,7 @@ test("entries and audio survive a browser restart (same profile)", async () => {
   });
   try {
     let page = await ctx.newPage();
-    await page.goto(`${baseURL}/`);
-    await page.getByTestId("home-record").click();
+    await page.goto(`${baseURL}/new`);
     const recordBtn = page.getByTestId("record-button");
     await recordBtn.click();
     await page.waitForTimeout(700);

@@ -28,8 +28,12 @@ export function Home() {
         </p>
       </section>
 
-      <Link to="/new" className="btn btn--primary btn--block" data-testid="home-record">
-        Record a word
+      <Link
+        to="/interview"
+        className="btn btn--primary btn--block"
+        data-testid="home-record"
+      >
+        Start recording
       </Link>
 
       {count && count > 0 ? (
@@ -42,7 +46,7 @@ export function Home() {
         </Link>
       ) : (
         <p className="muted" data-testid="home-hint">
-          Your first recording takes about a minute. Tap Record a word to begin.
+          Your first recording takes about a minute. Tap Start recording to begin.
         </p>
       )}
 

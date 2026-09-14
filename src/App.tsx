@@ -1,5 +1,6 @@
 import { Link, Route, Routes } from "react-router-dom";
 import { Home } from "./routes/Home";
+import { Interview } from "./routes/Interview";
 import { NewEntry } from "./routes/NewEntry";
 import { Dictionary } from "./routes/Dictionary";
 import { EntryDetail } from "./routes/EntryDetail";
@@ -20,6 +21,7 @@ export function App() {
       <main className="app__main">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/interview" element={<Interview />} />
           <Route path="/new" element={<NewEntry />} />
           <Route path="/dictionary" element={<Dictionary />} />
           <Route path="/entry/:id" element={<EntryDetail />} />
