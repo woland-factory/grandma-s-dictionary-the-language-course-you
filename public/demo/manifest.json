@@ -1,1 +1,54 @@
-{ "schemaVersion": 1, "entries": [] }
+{
+  "schemaVersion": 1,
+  "entries": [
+    {
+      "writtenForm": "yiayia",
+      "meaning": "grandmother",
+      "category": "kinship",
+      "audio": "demo/audio/yiayia-elder.wav",
+      "durationMs": 1160,
+      "attempt": { "audio": "demo/audio/yiayia-child.wav", "durationMs": 920 }
+    },
+    {
+      "writtenForm": "pappou",
+      "meaning": "grandfather",
+      "category": "kinship",
+      "audio": "demo/audio/pappou-elder.wav",
+      "durationMs": 580,
+      "attempt": { "audio": "demo/audio/pappou-child.wav", "durationMs": 460 }
+    },
+    {
+      "writtenForm": "agapi mou",
+      "meaning": "my love",
+      "category": "endearments",
+      "audio": "demo/audio/agapi-mou-elder.wav",
+      "durationMs": 1160,
+      "attempt": { "audio": "demo/audio/agapi-mou-child.wav", "durationMs": 920 }
+    },
+    {
+      "writtenForm": "stin ygeia sou",
+      "meaning": "to your health",
+      "category": "blessings",
+      "audio": "demo/audio/stin-ygeia-sou-elder.wav",
+      "durationMs": 1160,
+      "attempt": {
+        "audio": "demo/audio/stin-ygeia-sou-child.wav",
+        "durationMs": 920
+      }
+    },
+    {
+      "writtenForm": "psomi",
+      "meaning": "bread",
+      "category": "foods",
+      "audio": "demo/audio/psomi-elder.wav",
+      "durationMs": 580
+    },
+    {
+      "writtenForm": "kalinychta",
+      "meaning": "good night",
+      "category": "for-children",
+      "audio": "demo/audio/kalinychta-elder.wav",
+      "durationMs": 1160
+    }
+  ]
+}

@@ -94,4 +94,82 @@ describe("maybeSeedDemo", () => {
     expect(entry.meaning).toBe("grandmother");
     expect(entry.category).toBe("kinship");
   });
+
+  it("seeds a child attempt for an entry that carries one", async () => {
+    const { seed, db } = await load("1");
+    mockFetch((url) => {
+      if (url.includes("manifest.json")) {
+        return new Response(
+          JSON.stringify({
+            schemaVersion: 1,
+            entries: [
+              {
+                writtenForm: "yiayia",
+                meaning: "grandmother",
+                category: "kinship",
+                audio: "demo/audio/yiayia-elder.wav",
+                durationMs: 1160,
+                attempt: {
+                  audio: "demo/audio/yiayia-child.wav",
+                  durationMs: 920,
+                },
+              },
+              {
+                writtenForm: "psomi",
+                meaning: "bread",
+                category: "foods",
+                audio: "demo/audio/psomi-elder.wav",
+                durationMs: 580,
+              },
+            ],
+          }),
+        );
+      }
+      return new Response(
+        new Blob([new Uint8Array(16)], { type: "audio/wav" }),
+      );
+    });
+    await seed.maybeSeedDemo();
+
+    expect(await db.countEntries()).toBe(2);
+    const rows = await db.listEntries();
+    const withAttempt = rows.find((e) => e.meaning === "grandmother")!;
+    const elderOnly = rows.find((e) => e.meaning === "bread")!;
+    expect((await db.listAttempts(withAttempt.id)).length).toBe(1);
+    expect((await db.listAttempts(elderOnly.id)).length).toBe(0);
+  });
+
+  it("saves the entry even when its attempt asset is missing", async () => {
+    const { seed, db } = await load("1");
+    mockFetch((url) => {
+      if (url.includes("manifest.json")) {
+        return new Response(
+          JSON.stringify({
+            schemaVersion: 1,
+            entries: [
+              {
+                writtenForm: "yiayia",
+                meaning: "grandmother",
+                category: "kinship",
+                audio: "demo/audio/yiayia-elder.wav",
+                durationMs: 1160,
+                attempt: { audio: "demo/audio/missing.wav", durationMs: 900 },
+              },
+            ],
+          }),
+        );
+      }
+      if (url.includes("missing.wav")) {
+        return new Response("not found", { status: 404 });
+      }
+      return new Response(
+        new Blob([new Uint8Array(16)], { type: "audio/wav" }),
+      );
+    });
+    await seed.maybeSeedDemo();
+
+    expect(await db.countEntries()).toBe(1);
+    const [entry] = await db.listEntries();
+    expect(await db.listAttempts(entry.id)).toHaveLength(0);
+  });
 });

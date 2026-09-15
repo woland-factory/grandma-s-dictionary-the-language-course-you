@@ -2,19 +2,27 @@ import { seedDemoEnabled } from "./config";
 import {
   countEntries,
   getMeta,
+  saveAttempt,
   saveEntryWithRecording,
   setMeta,
 } from "./db";
 
-// Demo manifest shape (EPIC 3 fills the entries and audio files). This EPIC
-// ships an empty manifest, and the loader must complete cleanly on it.
+// One child record-back bundled beside a demo entry, so the two-voice moment
+// plays with no hand-crafted input.
+interface ManifestAttempt {
+  audio: string; // path under public/, e.g. "demo/audio/word-child.wav"
+  durationMs: number;
+}
+
+// Demo manifest shape. The loader tolerates entries without `attempt`.
 interface ManifestEntry {
   writtenForm?: string;
   meaning: string;
   category: string;
   promptId?: string;
-  audio: string; // path under public/, e.g. "demo/audio/word.webm"
+  audio: string; // path under public/, e.g. "demo/audio/word-elder.wav"
   durationMs: number;
+  attempt?: ManifestAttempt;
 }
 
 interface Manifest {
@@ -62,7 +70,7 @@ async function seedOne(item: ManifestEntry): Promise<void> {
     const audioRes = await fetch(item.audio, { cache: "no-store" });
     if (!audioRes.ok) return;
     const blob = await audioRes.blob();
-    await saveEntryWithRecording({
+    const { entry } = await saveEntryWithRecording({
       writtenForm: item.writtenForm,
       meaning: item.meaning,
       category: item.category,
@@ -73,6 +81,26 @@ async function seedOne(item: ManifestEntry): Promise<void> {
         durationMs: item.durationMs,
       },
     });
+
+    // A child attempt makes the two-voice moment playable on load. A missing or
+    // bad attempt asset skips only the attempt; the elder entry still stands.
+    if (item.attempt) {
+      try {
+        const attemptRes = await fetch(item.attempt.audio, {
+          cache: "no-store",
+        });
+        if (attemptRes.ok) {
+          const attemptBlob = await attemptRes.blob();
+          await saveAttempt(entry.id, {
+            blob: attemptBlob,
+            mimeType: attemptBlob.type || "audio/webm",
+            durationMs: item.attempt.durationMs,
+          });
+        }
+      } catch {
+        // Skip only the attempt; the elder entry is already saved.
+      }
+    }
   } catch {
     // Skip a single bad entry; keep loading the rest.
   }
