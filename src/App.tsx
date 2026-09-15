@@ -4,6 +4,7 @@ import { Interview } from "./routes/Interview";
 import { NewEntry } from "./routes/NewEntry";
 import { Dictionary } from "./routes/Dictionary";
 import { EntryDetail } from "./routes/EntryDetail";
+import { Practice } from "./routes/Practice";
 import { EmptyState } from "./components/states/EmptyState";
 
 // Mobile-first shell: a slim header and a single centered content column.
@@ -25,6 +26,7 @@ export function App() {
           <Route path="/new" element={<NewEntry />} />
           <Route path="/dictionary" element={<Dictionary />} />
           <Route path="/entry/:id" element={<EntryDetail />} />
+          <Route path="/practice" element={<Practice />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

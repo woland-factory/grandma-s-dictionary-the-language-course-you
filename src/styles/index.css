@@ -536,6 +536,89 @@ textarea:focus-visible,
   flex-wrap: wrap;
 }
 
+/* Two-voice moment ------------------------------------------------------- */
+
+.two-voice {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.two-voice__play {
+  font-size: 1.15rem;
+  min-height: 56px;
+}
+
+.two-voice__icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.two-voice__indicator {
+  margin: 0;
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  min-height: 1.2em;
+}
+
+/* Voice history ---------------------------------------------------------- */
+
+.attempt-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.attempt-item {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+}
+
+.attempt-item__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.attempt-item__who {
+  margin: 0;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.attempt-item__date {
+  margin: 2px 0 0;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+}
+
+/* Practice --------------------------------------------------------------- */
+
+.practice__progress {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+.practice__word {
+  margin: 0;
+  font-size: 1.6rem;
+}
+
+.practice__actions {
+  display: flex;
+  justify-content: center;
+}
+
 /* Category tag in the dictionary list. */
 .entry-item__tag {
   display: inline-block;

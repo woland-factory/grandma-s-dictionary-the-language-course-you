@@ -4,7 +4,7 @@ import { countEntries } from "../lib/db";
 import { StorageStatusBar } from "../components/StorageStatusBar";
 
 // First-run home. The shell paints immediately with one obvious primary action.
-// The entry count loads after paint and only changes the secondary line.
+// The entry count loads after paint and only changes the secondary lines.
 export function Home() {
   const [count, setCount] = useState<number | null>(null);
 
@@ -17,6 +17,8 @@ export function Home() {
       alive = false;
     };
   }, []);
+
+  const hasEntries = count !== null && count > 0;
 
   return (
     <div className="stack">
@@ -36,14 +38,23 @@ export function Home() {
         Start recording
       </Link>
 
-      {count && count > 0 ? (
-        <Link
-          to="/dictionary"
-          className="btn btn--secondary btn--block"
-          data-testid="home-dictionary"
-        >
-          Open the dictionary ({count})
-        </Link>
+      {hasEntries ? (
+        <>
+          <Link
+            to="/dictionary"
+            className="btn btn--secondary btn--block"
+            data-testid="home-dictionary"
+          >
+            Open the dictionary ({count})
+          </Link>
+          <Link
+            to="/practice"
+            className="btn btn--ghost btn--block"
+            data-testid="home-practice"
+          >
+            Practice these words
+          </Link>
+        </>
       ) : (
         <p className="muted" data-testid="home-hint">
           Your first recording takes about a minute. Tap Start recording to begin.
