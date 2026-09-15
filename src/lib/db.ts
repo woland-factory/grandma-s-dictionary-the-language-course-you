@@ -308,6 +308,11 @@ export async function countEntries(): Promise<number> {
   return db.count("entries");
 }
 
+export async function countAttempts(): Promise<number> {
+  const db = await getDB();
+  return db.count("attempts");
+}
+
 // ---- attempts (child record-backs) & the revisit schedule -------------------
 
 export interface AttemptAudioInput {

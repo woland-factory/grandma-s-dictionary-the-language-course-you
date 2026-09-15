@@ -257,6 +257,26 @@ describe("saveAttempt", () => {
     expect(due.map((e) => e.id)).not.toContain(entry.id);
   });
 
+  it("counts attempts across all entries", async () => {
+    const { countAttempts } = await import("./db");
+    expect(await countAttempts()).toBe(0);
+    const { entry } = await saveEntryWithRecording({
+      meaning: "bread",
+      audio: { blob: makeBlob(), mimeType: "audio/webm", durationMs: 100 },
+    });
+    await saveAttempt(entry.id, {
+      blob: makeBlob(),
+      mimeType: "audio/webm",
+      durationMs: 100,
+    });
+    await saveAttempt(entry.id, {
+      blob: makeBlob(),
+      mimeType: "audio/webm",
+      durationMs: 100,
+    });
+    expect(await countAttempts()).toBe(2);
+  });
+
   it("caps listAttempts at the requested limit", async () => {
     const { entry } = await saveEntryWithRecording({
       meaning: "bread",
