@@ -57,6 +57,11 @@ export async function maybeSeedDemo(): Promise<void> {
       for (const item of entries) {
         await seedOne(item);
       }
+      // Let already-mounted screens (Home) pick up the seeded words, since the
+      // seed finishes after first paint.
+      if (entries.length > 0 && typeof window !== "undefined") {
+        window.dispatchEvent(new Event("demo-seeded"));
+      }
     }
   } catch {
     // Ignore: a missing or malformed manifest must not crash the app.

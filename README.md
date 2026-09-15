@@ -1,12 +1,15 @@
 # Grandma's Dictionary
 
 Record a family elder saying the words, names, and sayings in your family's
-language, and keep them in their own voice. It runs in the browser with no
-account and no setup, and everything stays on your device.
+language, and keep them in their own voice. A child hears the elder, says the
+word back, and both voices sit side by side in one file your family owns. It
+runs in the browser with no account and no setup, and everything stays on your
+device.
 
-This is the foundation: record a word, add what it means, save it, and play it
-back from your growing dictionary. The guided interview, child record-back, the
-two-voice moment, and export arrive in later releases.
+A guided interview walks you through prompts and records each answer into your
+talking dictionary. Open a word to play the elder and then the child saying it
+back, one tap for both voices. Practice surfaces words to revisit on a spreading
+schedule. Export arrives in a later release.
 
 ## Run it
 
@@ -69,12 +72,13 @@ is serving the static files and answering the health check.
 
 Code layout:
 
-- `src/routes`: the screens (home, record, dictionary, entry detail).
-- `src/components`: the record control, audio player, and designed empty,
-  loading, and error states.
+- `src/routes`: the screens (home, guided interview, record, dictionary, entry
+  detail with the two-voice moment and record-back, and practice).
+- `src/components`: the record control, audio players, the two-voice player,
+  the voice history, and designed empty, loading, and error states.
 - `src/lib`: IndexedDB access and migrations (`db.ts`), audio capture
-  (`audio.ts`), storage status (`storage.ts`), runtime config, demo seeding,
-  and telemetry.
+  (`audio.ts`), the revisit schedule (`revisit.ts`), storage status
+  (`storage.ts`), runtime config, demo seeding, and telemetry.
 
 ## License
 

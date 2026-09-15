@@ -10,11 +10,17 @@ export function Home() {
 
   useEffect(() => {
     let alive = true;
-    void countEntries().then((n) => {
-      if (alive) setCount(n);
-    });
+    const refresh = () => {
+      void countEntries().then((n) => {
+        if (alive) setCount(n);
+      });
+    };
+    refresh();
+    // The demo seed finishes after first paint; refresh when it signals.
+    window.addEventListener("demo-seeded", refresh);
     return () => {
       alive = false;
+      window.removeEventListener("demo-seeded", refresh);
     };
   }, []);
 

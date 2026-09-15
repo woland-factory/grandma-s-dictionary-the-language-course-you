@@ -2,6 +2,20 @@
   "schemaVersion": 1,
   "entries": [
     {
+      "writtenForm": "psomi",
+      "meaning": "bread",
+      "category": "foods",
+      "audio": "demo/audio/psomi-elder.wav",
+      "durationMs": 580
+    },
+    {
+      "writtenForm": "kalinychta",
+      "meaning": "good night",
+      "category": "for-children",
+      "audio": "demo/audio/kalinychta-elder.wav",
+      "durationMs": 1160
+    },
+    {
       "writtenForm": "yiayia",
       "meaning": "grandmother",
       "category": "kinship",
@@ -35,20 +49,6 @@
         "audio": "demo/audio/stin-ygeia-sou-child.wav",
         "durationMs": 920
       }
-    },
-    {
-      "writtenForm": "psomi",
-      "meaning": "bread",
-      "category": "foods",
-      "audio": "demo/audio/psomi-elder.wav",
-      "durationMs": 580
-    },
-    {
-      "writtenForm": "kalinychta",
-      "meaning": "good night",
-      "category": "for-children",
-      "audio": "demo/audio/kalinychta-elder.wav",
-      "durationMs": 1160
     }
   ]
 }
