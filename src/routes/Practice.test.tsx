@@ -12,6 +12,12 @@ import {
   saveEntryWithRecording,
 } from "../lib/db";
 
+// The nudge's export path is exercised without building a real zip.
+const downloadArchiveMock = vi.hoisted(() => vi.fn());
+vi.mock("../lib/archive", () => ({
+  downloadArchive: downloadArchiveMock,
+}));
+
 vi.mock("../lib/useRecorder", async () => {
   const { useState } = await import("react");
   return {
@@ -48,6 +54,7 @@ function renderPractice() {
 
 beforeEach(() => {
   vi.restoreAllMocks();
+  downloadArchiveMock.mockReset().mockResolvedValue(undefined);
   globalThis.indexedDB = new IDBFactory();
   _resetDBForTests();
   if (!("createObjectURL" in URL)) {
@@ -135,5 +142,55 @@ describe("Practice due queue", () => {
     expect(screen.getByTestId("practice-open-dictionary")).toBeInTheDocument();
     // No streak or badge language.
     expect(screen.queryByText(/streak/i)).not.toBeInTheDocument();
+    // No takes saved this session: nothing new to back up, no nudge.
+    expect(screen.queryByTestId("export-nudge")).not.toBeInTheDocument();
+  });
+});
+
+describe("Practice export nudge", () => {
+  it("nudges on caught-up after a saved take, exports in one tap, and dismisses", async () => {
+    await seedDue("due now", Date.now() - 1000);
+    renderPractice();
+    await screen.findByText("due now");
+
+    const user = userEvent.setup();
+    const recordBtn = screen.getByTestId("record-button");
+    await user.click(recordBtn); // start
+    await user.click(recordBtn); // stop -> saveAttempt
+
+    await screen.findByText(/all caught up/i);
+    expect(screen.getByTestId("export-nudge")).toBeInTheDocument();
+
+    await user.click(screen.getByTestId("nudge-export"));
+    expect(downloadArchiveMock).toHaveBeenCalledOnce();
+    await screen.findByTestId("nudge-saved");
+  });
+
+  it("stays away when the session only skipped", async () => {
+    await seedDue("due now", Date.now() - 1000);
+    renderPractice();
+    await screen.findByText("due now");
+
+    const user = userEvent.setup();
+    await user.click(screen.getByTestId("practice-skip"));
+
+    await screen.findByText(/all caught up/i);
+    expect(screen.queryByTestId("export-nudge")).not.toBeInTheDocument();
+  });
+
+  it("Not now hides the nudge for that view", async () => {
+    await seedDue("due now", Date.now() - 1000);
+    renderPractice();
+    await screen.findByText("due now");
+
+    const user = userEvent.setup();
+    const recordBtn = screen.getByTestId("record-button");
+    await user.click(recordBtn);
+    await user.click(recordBtn);
+    await screen.findByText(/all caught up/i);
+
+    await user.click(screen.getByTestId("nudge-dismiss"));
+    expect(screen.queryByTestId("export-nudge")).not.toBeInTheDocument();
+    expect(downloadArchiveMock).not.toHaveBeenCalled();
   });
 });

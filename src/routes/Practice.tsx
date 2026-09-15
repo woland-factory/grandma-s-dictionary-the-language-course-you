@@ -8,6 +8,7 @@ import {
 } from "../lib/db";
 import type { Recording } from "../lib/audio";
 import { AudioPlayer } from "../components/AudioPlayer";
+import { ExportNudge } from "../components/ExportNudge";
 import { RecordBack } from "../components/RecordBack";
 import { EmptyState } from "../components/states/EmptyState";
 import { LoadingSkeleton } from "../components/states/LoadingSkeleton";
@@ -19,6 +20,7 @@ import { LoadingSkeleton } from "../components/states/LoadingSkeleton";
 export function Practice() {
   const [queue, setQueue] = useState<Entry[] | null>(null);
   const [index, setIndex] = useState(0);
+  const [savedCount, setSavedCount] = useState(0);
   const [elderBlob, setElderBlob] = useState<Blob | null>(null);
 
   useEffect(() => {
@@ -55,6 +57,7 @@ export function Practice() {
         mimeType: recording.mimeType,
         durationMs: recording.durationMs,
       });
+      setSavedCount((n) => n + 1);
       setIndex((i) => i + 1);
     },
     [current],
@@ -73,7 +76,7 @@ export function Practice() {
   }
 
   if (!current) {
-    return <CaughtUp />;
+    return <CaughtUp showNudge={savedCount > 0} />;
   }
 
   const title = current.writtenForm || current.meaning;
@@ -109,7 +112,7 @@ export function Practice() {
   );
 }
 
-function CaughtUp() {
+function CaughtUp({ showNudge }: { showNudge: boolean }) {
   return (
     <div className="stack">
       <EmptyState
@@ -126,6 +129,7 @@ function CaughtUp() {
           </Link>
         }
       />
+      {showNudge ? <ExportNudge /> : null}
       <Link to="/interview" className="btn btn--secondary btn--block">
         Record more words
       </Link>

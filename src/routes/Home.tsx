@@ -60,6 +60,13 @@ export function Home() {
           >
             Practice these words
           </Link>
+          <Link
+            to="/data"
+            className="btn btn--ghost btn--block"
+            data-testid="home-data"
+          >
+            Save a backup
+          </Link>
         </>
       ) : (
         <p className="muted" data-testid="home-hint">

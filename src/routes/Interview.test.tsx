@@ -8,6 +8,12 @@ import { DECK } from "../data/deck";
 import * as capabilities from "../lib/capabilities";
 import { _resetDBForTests, countEntries, listEntries } from "../lib/db";
 
+// The nudge's export path is exercised without building a real zip.
+const downloadArchiveMock = vi.hoisted(() => vi.fn());
+vi.mock("../lib/archive", () => ({
+  downloadArchive: downloadArchiveMock,
+}));
+
 // A controllable stand-in for the media recorder: no getUserMedia, no
 // MediaRecorder. start() flips to "recording" synchronously; stop() returns a
 // small fake clip. This exercises the interview flow without real audio.
@@ -56,6 +62,7 @@ async function recordOnce(user: ReturnType<typeof userEvent.setup>) {
 
 beforeEach(() => {
   vi.restoreAllMocks();
+  downloadArchiveMock.mockReset().mockResolvedValue(undefined);
   globalThis.indexedDB = new IDBFactory();
   _resetDBForTests();
   // jsdom lacks object URLs; the AudioPlayer only needs them to be callable.
@@ -157,5 +164,41 @@ describe("Interview flow", () => {
       /ready when you are/i,
     );
     expect(screen.getByTestId("summary-dictionary")).toBeInTheDocument();
+  });
+});
+
+describe("Interview export nudge", () => {
+  it("nudges after a session with a saved word and exports in one tap", async () => {
+    const user = userEvent.setup();
+    renderInterview();
+    await recordOnce(user);
+    await user.click(screen.getByTestId("interview-save"));
+    await screen.findByText(`2 of ${DECK.length}`);
+    await user.click(screen.getByTestId("interview-done"));
+
+    expect(screen.getByTestId("export-nudge")).toBeInTheDocument();
+    await user.click(screen.getByTestId("nudge-export"));
+    expect(downloadArchiveMock).toHaveBeenCalledOnce();
+    await screen.findByTestId("nudge-saved");
+  });
+
+  it("dismisses with Not now", async () => {
+    const user = userEvent.setup();
+    renderInterview();
+    await recordOnce(user);
+    await user.click(screen.getByTestId("interview-save"));
+    await screen.findByText(`2 of ${DECK.length}`);
+    await user.click(screen.getByTestId("interview-done"));
+
+    await user.click(screen.getByTestId("nudge-dismiss"));
+    expect(screen.queryByTestId("export-nudge")).not.toBeInTheDocument();
+    expect(downloadArchiveMock).not.toHaveBeenCalled();
+  });
+
+  it("stays away when the session saved nothing", async () => {
+    const user = userEvent.setup();
+    renderInterview();
+    await user.click(screen.getByTestId("interview-done"));
+    expect(screen.queryByTestId("export-nudge")).not.toBeInTheDocument();
   });
 });

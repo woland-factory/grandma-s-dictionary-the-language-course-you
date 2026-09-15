@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { RecordButton } from "../components/RecordButton";
 import { AudioPlayer } from "../components/AudioPlayer";
+import { ExportNudge } from "../components/ExportNudge";
 import { ErrorState } from "../components/states/ErrorState";
 import { detectCapabilities } from "../lib/capabilities";
 import { useRecorder } from "../lib/useRecorder";
@@ -306,6 +307,8 @@ function InterviewSummary({
           </>
         )}
       </div>
+
+      {hasEntries ? <ExportNudge /> : null}
 
       <Link
         to="/dictionary"
