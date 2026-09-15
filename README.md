@@ -9,7 +9,9 @@ device.
 A guided interview walks you through prompts and records each answer into your
 talking dictionary. Open a word to play the elder and then the child saying it
 back, one tap for both voices. Practice surfaces words to revisit on a spreading
-schedule. Export arrives in a later release.
+schedule. The data screen saves the whole dictionary as one zip file, with a
+readable manifest and the audio files inside, and opens a saved file on any
+device to merge those words in without duplicating what is already there.
 
 ## Run it
 
@@ -73,12 +75,15 @@ is serving the static files and answering the health check.
 Code layout:
 
 - `src/routes`: the screens (home, guided interview, record, dictionary, entry
-  detail with the two-voice moment and record-back, and practice).
+  detail with the two-voice moment and record-back, practice, and the data
+  screen for backup files).
 - `src/components`: the record control, audio players, the two-voice player,
-  the voice history, and designed empty, loading, and error states.
+  the voice history, the export nudge, and designed empty, loading, and error
+  states.
 - `src/lib`: IndexedDB access and migrations (`db.ts`), audio capture
-  (`audio.ts`), the revisit schedule (`revisit.ts`), storage status
-  (`storage.ts`), runtime config, demo seeding, and telemetry.
+  (`audio.ts`), the zip backup format (`archive.ts`), the revisit schedule
+  (`revisit.ts`), storage status (`storage.ts`), runtime config, demo seeding,
+  and telemetry.
 
 ## License
 
