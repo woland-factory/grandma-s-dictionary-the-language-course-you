@@ -5,6 +5,7 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { IDBFactory } from "fake-indexeddb";
 import { EntryDetail } from "./EntryDetail";
 import * as capabilities from "../lib/capabilities";
+import * as db from "../lib/db";
 import {
   _resetDBForTests,
   listAttempts,
@@ -154,6 +155,43 @@ describe("EntryDetail two-voice + record-back", () => {
     await waitFor(() =>
       expect(screen.getByTestId("attempt-play")).toBeInTheDocument(),
     );
+  });
+
+  it("shows the designed reload state when the entry read rejects", async () => {
+    vi.spyOn(db, "getEntry").mockRejectedValueOnce(new Error("read failed"));
+    renderEntry("any-id");
+
+    expect(await screen.findByText("Reload to see your words")).toBeInTheDocument();
+    expect(screen.getByTestId("load-error-reload")).toBeInTheDocument();
+    // Not the missing-entry empty state and not a stuck skeleton.
+    expect(screen.queryByText("This word is not here")).not.toBeInTheDocument();
+  });
+
+  it("plays both voices once, marking the two-voice moment via meta and event", async () => {
+    const id = await seedEntry();
+    await saveAttempt(id, {
+      blob: makeBlob(40),
+      mimeType: "audio/webm",
+      durationMs: 500,
+    });
+    const events: string[] = [];
+    const listener = () => events.push("two-voice-played");
+    window.addEventListener("two-voice-played", listener);
+
+    renderEntry(id);
+    const play = await screen.findByTestId("two-voice-play");
+
+    const user = userEvent.setup();
+    await user.click(play); // elder plays first
+    await act(async () => {
+      playedEls[0].dispatchEvent(new Event("ended")); // crosses into the attempt
+    });
+
+    await waitFor(async () =>
+      expect(await db.getMeta<boolean>("twoVoicePlayed")).toBe(true),
+    );
+    expect(events).toEqual(["two-voice-played"]);
+    window.removeEventListener("two-voice-played", listener);
   });
 
   it("with an attempt present, Play plays the elder then the latest attempt in order", async () => {

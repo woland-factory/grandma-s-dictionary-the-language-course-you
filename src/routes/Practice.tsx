@@ -11,6 +11,7 @@ import { AudioPlayer } from "../components/AudioPlayer";
 import { ExportNudge } from "../components/ExportNudge";
 import { RecordBack } from "../components/RecordBack";
 import { EmptyState } from "../components/states/EmptyState";
+import { ErrorState } from "../components/states/ErrorState";
 import { LoadingSkeleton } from "../components/states/LoadingSkeleton";
 
 // One-at-a-time practice over the due queue: hear the elder, say it back, move
@@ -19,15 +20,21 @@ import { LoadingSkeleton } from "../components/states/LoadingSkeleton";
 // when nothing is due.
 export function Practice() {
   const [queue, setQueue] = useState<Entry[] | null>(null);
+  const [failed, setFailed] = useState(false);
   const [index, setIndex] = useState(0);
   const [savedCount, setSavedCount] = useState(0);
   const [elderBlob, setElderBlob] = useState<Blob | null>(null);
 
   useEffect(() => {
     let alive = true;
-    void listDueEntries().then((rows) => {
-      if (alive) setQueue(rows);
-    });
+    listDueEntries()
+      .then((rows) => {
+        if (alive) setQueue(rows);
+      })
+      .catch(() => {
+        // The read rejected. Show a way out instead of an endless skeleton.
+        if (alive) setFailed(true);
+      });
     return () => {
       alive = false;
     };
@@ -65,6 +72,28 @@ export function Practice() {
 
   function handleSkip() {
     setIndex((i) => i + 1);
+  }
+
+  if (failed) {
+    return (
+      <div className="stack">
+        <ErrorState
+          icon="📖"
+          title="Reload to see your words"
+          body="Reload the page to try again. Your saved words stay on this device."
+          action={
+            <button
+              type="button"
+              className="btn btn--primary"
+              onClick={() => window.location.reload()}
+              data-testid="load-error-reload"
+            >
+              Reload
+            </button>
+          }
+        />
+      </div>
+    );
   }
 
   if (queue === null) {

@@ -3,6 +3,10 @@ import { useEffect, useRef, useState } from "react";
 interface TwoVoicePlayerProps {
   elderBlob: Blob | null;
   attemptBlob: Blob | null;
+  // Fired once when playback crosses from the elder segment into the attempt
+  // segment (so only when an attempt exists). The player stays otherwise pure;
+  // the caller decides what the crossing means.
+  onBothVoicesPlayed?: () => void;
 }
 
 type Voice = "idle" | "elder" | "attempt";
@@ -12,9 +16,14 @@ type Voice = "idle" | "elder" | "attempt";
 // Object URLs are created when the blobs arrive and revoked on cleanup, like
 // AudioPlayer, so nothing leaks. Pressed feedback flips synchronously on tap,
 // before any audio starts.
-export function TwoVoicePlayer({ elderBlob, attemptBlob }: TwoVoicePlayerProps) {
+export function TwoVoicePlayer({
+  elderBlob,
+  attemptBlob,
+  onBothVoicesPlayed,
+}: TwoVoicePlayerProps) {
   const elderRef = useRef<HTMLAudioElement | null>(null);
   const attemptRef = useRef<HTMLAudioElement | null>(null);
+  const bothPlayedRef = useRef(false);
   const [voice, setVoice] = useState<Voice>("idle");
 
   useEffect(() => {
@@ -55,6 +64,11 @@ export function TwoVoicePlayer({ elderBlob, attemptBlob }: TwoVoicePlayerProps) 
       return;
     }
     setVoice("attempt");
+    // The signature moment: both voices have now played in sequence. Fire once.
+    if (!bothPlayedRef.current) {
+      bothPlayedRef.current = true;
+      onBothVoicesPlayed?.();
+    }
     const onEnd = () => {
       attempt.removeEventListener("ended", onEnd);
       setVoice("idle");

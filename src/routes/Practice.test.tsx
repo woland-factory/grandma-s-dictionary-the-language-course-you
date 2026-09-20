@@ -5,6 +5,7 @@ import { MemoryRouter } from "react-router-dom";
 import { IDBFactory } from "fake-indexeddb";
 import { Practice } from "./Practice";
 import * as capabilities from "../lib/capabilities";
+import * as db from "../lib/db";
 import {
   _resetDBForTests,
   getDB,
@@ -144,6 +145,20 @@ describe("Practice due queue", () => {
     expect(screen.queryByText(/streak/i)).not.toBeInTheDocument();
     // No takes saved this session: nothing new to back up, no nudge.
     expect(screen.queryByTestId("export-nudge")).not.toBeInTheDocument();
+  });
+});
+
+describe("Practice load-error state", () => {
+  it("shows the designed reload state when the initial read rejects", async () => {
+    vi.spyOn(db, "listDueEntries").mockRejectedValueOnce(
+      new Error("read failed"),
+    );
+    renderPractice();
+
+    await screen.findByText("Reload to see your words");
+    expect(screen.getByTestId("load-error-reload")).toBeInTheDocument();
+    // Not stuck on a skeleton and not showing the caught-up empty state.
+    expect(screen.queryByText(/all caught up/i)).not.toBeInTheDocument();
   });
 });
 

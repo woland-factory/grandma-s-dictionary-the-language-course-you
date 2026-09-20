@@ -7,6 +7,7 @@ import {
   getLatestAttempt,
   listAttempts,
   saveAttempt,
+  setMeta,
   type Attempt,
   type Entry,
 } from "../lib/db";
@@ -15,6 +16,7 @@ import { TwoVoicePlayer } from "../components/TwoVoicePlayer";
 import { AttemptList } from "../components/AttemptList";
 import { RecordBack } from "../components/RecordBack";
 import { EmptyState } from "../components/states/EmptyState";
+import { ErrorState } from "../components/states/ErrorState";
 import { LoadingSkeleton } from "../components/states/LoadingSkeleton";
 
 interface Loaded {
@@ -27,6 +29,7 @@ interface Loaded {
 type LoadState =
   | { status: "loading" }
   | { status: "missing" }
+  | { status: "error" }
   | { status: "ready"; data: Loaded };
 
 // One entry: the two-voice moment, a one-tap record-back, and the voice history.
@@ -50,23 +53,28 @@ export function EntryDetail() {
         if (alive) setLoad({ status: "missing" });
         return;
       }
-      const entry = await getEntry(id);
-      if (!entry) {
-        if (alive) setLoad({ status: "missing" });
-        return;
+      try {
+        const entry = await getEntry(id);
+        if (!entry) {
+          if (alive) setLoad({ status: "missing" });
+          return;
+        }
+        const elderBlob = (await getEntryAudio(entry))?.blob ?? null;
+        const { attempts, latestBlob } = await refreshAttempts(entry);
+        if (alive)
+          setLoad({
+            status: "ready",
+            data: {
+              entry,
+              elderBlob,
+              latestAttemptBlob: latestBlob,
+              attempts,
+            },
+          });
+      } catch {
+        // The read rejected. Show a way out instead of an endless skeleton.
+        if (alive) setLoad({ status: "error" });
       }
-      const elderBlob = (await getEntryAudio(entry))?.blob ?? null;
-      const { attempts, latestBlob } = await refreshAttempts(entry);
-      if (alive)
-        setLoad({
-          status: "ready",
-          data: {
-            entry,
-            elderBlob,
-            latestAttemptBlob: latestBlob,
-            attempts,
-          },
-        });
     }
     void run();
     return () => {
@@ -108,6 +116,28 @@ export function EntryDetail() {
     );
   }
 
+  if (load.status === "error") {
+    return (
+      <div className="stack">
+        <ErrorState
+          icon="📖"
+          title="Reload to see your words"
+          body="Reload the page to try again. Your saved words stay on this device."
+          action={
+            <button
+              type="button"
+              className="btn btn--primary"
+              onClick={() => window.location.reload()}
+              data-testid="load-error-reload"
+            >
+              Reload
+            </button>
+          }
+        />
+      </div>
+    );
+  }
+
   if (load.status === "missing") {
     return (
       <div className="stack">
@@ -138,7 +168,14 @@ export function EntryDetail() {
       <div className="card stack">
         <h1 style={{ margin: 0 }}>{title}</h1>
         {entry.writtenForm ? <p style={{ margin: 0 }}>{entry.meaning}</p> : null}
-        <TwoVoicePlayer elderBlob={elderBlob} attemptBlob={latestAttemptBlob} />
+        <TwoVoicePlayer
+          elderBlob={elderBlob}
+          attemptBlob={latestAttemptBlob}
+          onBothVoicesPlayed={() => {
+            void setMeta("twoVoicePlayed", true);
+            window.dispatchEvent(new Event("two-voice-played"));
+          }}
+        />
       </div>
 
       <RecordBack

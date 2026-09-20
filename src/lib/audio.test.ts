@@ -33,6 +33,12 @@ describe("pickMimeType", () => {
     expect(pickMimeType()).toBe("audio/webm;codecs=opus");
   });
 
+  it("picks audio/mp4 on Safari, which supports only that format", () => {
+    // Safari's MediaRecorder supports audio/mp4 (and audio/aac) but not webm.
+    stubIsTypeSupported(["audio/mp4"]);
+    expect(pickMimeType()).toBe("audio/mp4");
+  });
+
   it("returns undefined when nothing is supported (let recorder choose)", () => {
     stubIsTypeSupported([]);
     expect(pickMimeType()).toBeUndefined();

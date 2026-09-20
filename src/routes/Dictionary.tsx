@@ -4,17 +4,24 @@ import { listEntries, type Entry } from "../lib/db";
 import { categoryLabel } from "../data/deck";
 import { LazyEntryPlayer } from "../components/LazyEntryPlayer";
 import { EmptyState } from "../components/states/EmptyState";
+import { ErrorState } from "../components/states/ErrorState";
 import { LoadingSkeleton } from "../components/states/LoadingSkeleton";
 
 // The talking dictionary: saved entries newest first, each with a play control.
 export function Dictionary() {
   const [entries, setEntries] = useState<Entry[] | null>(null);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     let alive = true;
-    void listEntries().then((rows) => {
-      if (alive) setEntries(rows);
-    });
+    listEntries()
+      .then((rows) => {
+        if (alive) setEntries(rows);
+      })
+      .catch(() => {
+        // The read rejected. Show a way out instead of an endless skeleton.
+        if (alive) setFailed(true);
+      });
     return () => {
       alive = false;
     };
@@ -36,7 +43,23 @@ export function Dictionary() {
         </Link>
       </div>
 
-      {entries === null ? (
+      {failed ? (
+        <ErrorState
+          icon="📖"
+          title="Reload to see your words"
+          body="Reload the page to try again. Your saved words stay on this device."
+          action={
+            <button
+              type="button"
+              className="btn btn--primary"
+              onClick={() => window.location.reload()}
+              data-testid="load-error-reload"
+            >
+              Reload
+            </button>
+          }
+        />
+      ) : entries === null ? (
         <LoadingSkeleton rows={4} />
       ) : entries.length === 0 ? (
         <EmptyState

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { countEntries } from "../lib/db";
 import { StorageStatusBar } from "../components/StorageStatusBar";
+import { FirstRunGuide } from "../components/FirstRunGuide";
 
 // First-run home. The shell paints immediately with one obvious primary action.
 // The entry count loads after paint and only changes the secondary lines.
@@ -43,6 +44,8 @@ export function Home() {
       >
         Start recording
       </Link>
+
+      <FirstRunGuide />
 
       {hasEntries ? (
         <>
