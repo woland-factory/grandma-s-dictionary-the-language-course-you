@@ -54,6 +54,11 @@ Copy `.env.example` to `.env` to set them. Leave a value empty to keep that
 channel off. Analytics and error reports never include entry text, audio, or
 personal data.
 
+To try the app with a sample dictionary, set `SEED_DEMO=1`, for example
+`docker run --rm -e SEED_DEMO=1 -p 8080:80 grandmas-dictionary`. It loads a small
+demo on first open so the two-voice moment plays right away. The deploy config in
+`docker-compose.staging.yml` sets this flag for you.
+
 ## How it works
 
 A single-page React app. Words, recordings, and audio are stored locally in
